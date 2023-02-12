@@ -26,7 +26,7 @@ async function runEsbuild() {
     bundle: true,
     outdir: outdir,
     treeShaking: true,
-    minify: true,
+    //minify: true,
     legalComments: 'none',
     define: {
       'process.env.NODE_ENV': '"production"',
@@ -92,14 +92,6 @@ async function build() {
   )
 
   await zipFolder(`./${outdir}/chromium`)
-
-  // firefox
-  await copyFiles(
-    [...commonFiles, { src: 'src/manifest.v2.json', dst: 'manifest.json' }],
-    `./${outdir}/firefox`,
-  )
-
-  await zipFolder(`./${outdir}/firefox`)
 
   console.log('Build success.')
 }

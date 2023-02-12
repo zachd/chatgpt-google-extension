@@ -8,6 +8,7 @@ import './styles.scss'
 import { getPossibleElementByQuerySelector } from './utils'
 
 async function mount(question: string, siteConfig: SearchEngine) {
+  console.log('mounting')
   const container = document.createElement('div')
   container.className = 'chat-gpt-container'
 
@@ -26,17 +27,21 @@ async function mount(question: string, siteConfig: SearchEngine) {
 
   const siderbarContainer = getPossibleElementByQuerySelector(siteConfig.sidebarContainerQuery)
   if (siderbarContainer) {
+    console.log('prepending to ' + siderbarContainer)
     siderbarContainer.prepend(container)
   } else {
     container.classList.add('sidebar-free')
     const appendContainer = getPossibleElementByQuerySelector(siteConfig.appendContainerQuery)
     if (appendContainer) {
+      console.log('appending to ' + appendContainer)
       appendContainer.appendChild(container)
+    } else {
+      console.log('found nothing')
     }
   }
 
   render(
-    <ChatGPTContainer question={question} triggerMode={userConfig.triggerMode || 'always'} />,
+    <ChatGPTContainer question={question} triggerMode={userConfig.triggerMode || 'manually'} />,
     container,
   )
 }
@@ -46,14 +51,15 @@ const siteName = location.hostname.match(siteRegex)![0]
 const siteConfig = config[siteName]
 
 async function run() {
+  console.log('RUNNING')
   const searchInput = getPossibleElementByQuerySelector<HTMLInputElement>(siteConfig.inputQuery)
-  if (searchInput && searchInput.value) {
-    console.debug('Mount ChatGPT on', siteName)
+  if (searchInput && searchInput.textContent) {
+    console.info('Mount ChatGPT on', siteName)
     const userConfig = await getUserConfig()
     const searchValueWithLanguageOption =
       userConfig.language === Language.Auto
-        ? searchInput.value
-        : `${searchInput.value}(in ${userConfig.language})`
+        ? searchInput.textContent
+        : `${searchInput.textContent}(in ${userConfig.language})`
     mount(searchValueWithLanguageOption, siteConfig)
   }
 }
